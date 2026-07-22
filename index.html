@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meridian Property Group — Real Estate, Leasing & Building Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#12233f; --navy-2:#1d3a66; --gold:#b8862f; --gold-soft:#d9b877;
+    --ink:#1c2430; --muted:#5f6c85; --line:#e4e8ef; --bg:#fbfaf7; --card:#ffffff;
+    --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);line-height:1.65}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+  header{position:sticky;top:0;z-index:50;background:rgba(251,250,247,.92);
+         backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{font-family:var(--serif);font-size:1.35rem;color:var(--navy);font-weight:600;letter-spacing:-.01em}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:30px;font-size:.9rem;font-weight:500}
+  .navlinks a{color:var(--muted);transition:color .15s}
+  .navlinks a:hover{color:var(--navy)}
+  .navcta{background:var(--navy);color:#fff;padding:9px 18px;border-radius:6px;font-size:.85rem;font-weight:600}
+  @media(max-width:760px){.navlinks{display:none}}
+
+  .hero{background:
+      linear-gradient(180deg,rgba(18,35,63,.72),rgba(18,35,63,.82)),
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><rect width="20" height="20" fill="%2312233f"/></svg>');
+      background-size:cover;color:#fff;padding:96px 0 108px}
+  .hero .kicker{font-size:.8rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+  .hero h1{font-family:var(--serif);font-size:3rem;font-weight:600;line-height:1.1;margin:14px 0 18px;letter-spacing:-.02em;max-width:16ch}
+  .hero p{font-size:1.1rem;color:rgba(255,255,255,.82);max-width:52ch;margin-bottom:28px}
+  .hero .btns{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{padding:13px 26px;border-radius:7px;font-weight:600;font-size:.92rem;cursor:pointer;border:none}
+  .btn-gold{background:var(--gold);color:#231a06}
+  .btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
+  @media(max-width:600px){.hero h1{font-size:2.1rem}}
+
+  section{padding:76px 0}
+  .eyebrow{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:600}
+  h2{font-family:var(--serif);font-size:2rem;color:var(--navy);font-weight:600;margin:8px 0 8px;letter-spacing:-.01em}
+  .lead{color:var(--muted);max-width:56ch;margin-bottom:40px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .svc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:28px;transition:transform .18s,box-shadow .18s}
+  .svc:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(18,35,63,.08)}
+  .svc .ic{width:42px;height:42px;border-radius:9px;background:var(--navy);color:var(--gold-soft);
+           display:grid;place-items:center;font-family:var(--serif);font-size:1.2rem;margin-bottom:16px}
+  .svc h3{font-size:1.15rem;color:var(--navy);margin-bottom:8px}
+  .svc p{font-size:.92rem;color:var(--muted)}
+
+  .stats{background:var(--navy);color:#fff}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:center}
+  @media(max-width:700px){.statgrid{grid-template-columns:repeat(2,1fr)}}
+  .stat .n{font-family:var(--serif);font-size:2.4rem;color:var(--gold-soft);font-weight:600}
+  .stat .l{font-size:.82rem;color:rgba(255,255,255,.7);letter-spacing:.04em}
+
+  .docs{background:#fff;border-top:1px solid var(--line)}
+  .doclist{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.doclist{grid-template-columns:1fr}}
+  .doc{border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;gap:14px;align-items:flex-start}
+  .doc .pdf{flex:none;width:38px;height:46px;background:var(--gold);border-radius:4px;position:relative;
+            color:#231a06;font-size:.6rem;font-weight:700;display:grid;place-items:center;padding-top:8px}
+  .doc h4{font-size:.98rem;color:var(--navy)}
+  .doc p{font-size:.82rem;color:var(--muted)}
+
+  footer{background:var(--navy);color:rgba(255,255,255,.72);padding:52px 0 30px;font-size:.88rem}
+  .fgrid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px;margin-bottom:30px}
+  footer .brand{color:#fff}
+  footer a:hover{color:var(--gold-soft)}
+  .fcol h5{color:#fff;font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+  .fcol div{margin:5px 0}
+  .fbar{border-top:1px solid rgba(255,255,255,.14);padding-top:18px;font-size:.78rem;color:rgba(255,255,255,.5)}
+
+  .langtoggle{background:transparent;border:1px solid var(--line);color:var(--navy);
+      padding:8px 14px;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:var(--sans);margin-right:12px}
+  .langtoggle:hover{border-color:var(--gold);color:var(--gold)}
+  /* RTL when Arabic active */
+  body.rtl{direction:rtl}
+  body.rtl .navlinks{flex-direction:row-reverse}
+  body.rtl .msg.me{align-self:flex-start;border-bottom-right-radius:13px;border-bottom-left-radius:4px}
+  body.rtl .msg.bot{align-self:flex-end;border-bottom-left-radius:13px;border-bottom-right-radius:4px}
+  body.rtl #chatPanel,body.rtl #chatBtn{right:auto;left:24px}
+  body.rtl .cfoot{flex-direction:row-reverse}
+  /* ---- chat widget ---- */
+  #chatBtn{position:fixed;bottom:24px;right:24px;z-index:100;width:62px;height:62px;border-radius:50%;
+           background:var(--gold);border:none;cursor:pointer;box-shadow:0 8px 24px rgba(18,35,63,.28);
+           color:#231a06;font-size:1.5rem;display:grid;place-items:center;transition:transform .15s}
+  #chatBtn:hover{transform:scale(1.06)}
+  #chatPanel{position:fixed;bottom:98px;right:24px;z-index:100;width:370px;max-width:calc(100vw - 32px);
+             height:520px;max-height:calc(100vh - 130px);background:#fff;border-radius:16px;display:none;
+             flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(18,35,63,.3);border:1px solid var(--line)}
+  #chatPanel.open{display:flex}
+  .chhead{background:var(--navy);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:11px}
+  .chead .avatar{width:34px;height:34px;border-radius:50%;background:var(--gold);color:#231a06;
+                 display:grid;place-items:center;font-family:var(--serif);font-weight:600}
+  .chead .t{font-size:.95rem;font-weight:600}
+  .chead .s{font-size:.72rem;color:var(--gold-soft)}
+  .cbody{flex:1;overflow-y:auto;padding:18px;background:var(--bg);display:flex;flex-direction:column;gap:12px}
+  .msg{max-width:82%;padding:10px 13px;border-radius:13px;font-size:.88rem;line-height:1.5}
+  .bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+  .me{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+  .cite{font-size:.72rem;color:var(--muted);margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 18px 12px;background:var(--bg)}
+  .chip{font-size:.76rem;border:1px solid var(--line);background:#fff;color:var(--navy);
+        padding:6px 11px;border-radius:14px;cursor:pointer}
+  .chip:hover{border-color:var(--gold);color:var(--gold)}
+  .cfoot{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:#fff}
+  .cfoot input{flex:1;border:1px solid var(--line);border-radius:20px;padding:10px 15px;font-size:.88rem;outline:none;font-family:var(--sans)}
+  .cfoot input:focus{border-color:var(--gold)}
+  .cfoot button{background:var(--navy);color:#fff;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:1rem}
+  .note{font-size:.68rem;color:var(--muted);text-align:center;padding:6px 0 10px;background:#fff}
+</style>
+</head>
+<body>
+
+<header><div class="wrap"><nav>
+  <div class="brand">Meridian<span>.</span> Property Group</div>
+  <div class="navlinks">
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#docs">Resources</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <button class="langtoggle" id="langBtn" onclick="toggleLang()">العربية</button>
+  <a class="navcta" href="#contact">Book a consultation</a>
+</nav></div></header>
+
+<div class="hero"><div class="wrap">
+  <div class="kicker">Dubai · Riyadh · Cairo</div>
+  <h1>Real estate, leasing &amp; building management done properly.</h1>
+  <p>For over fifteen years Meridian has managed residential towers, commercial offices, and mixed-use developments across the GCC — with owners and tenants who stay.</p>
+  <div class="btns">
+    <button class="btn btn-gold" onclick="openChat()">Ask our assistant</button>
+    <a class="btn btn-ghost" href="#services">Explore services</a>
+  </div>
+</div></div>
+
+<section id="services"><div class="wrap">
+  <div class="eyebrow">What we do</div>
+  <h2>Five services, one point of contact</h2>
+  <p class="lead">From acquisition to day-to-day building management, Meridian covers the full lifecycle of a property.</p>
+  <div class="grid">
+    <div class="svc"><div class="ic">01</div><h3>Sales &amp; Acquisition</h3><p>Buyer and seller representation, valuation, and negotiation. 2% brokerage on completion.</p></div>
+    <div class="svc"><div class="ic">02</div><h3>Leasing &amp; Tenant Placement</h3><p>Marketing, screening, contracts, and Ejari registration. 5% of first-year rent.</p></div>
+    <div class="svc"><div class="ic">03</div><h3>Property Management</h3><p>Rent collection, maintenance, inspections, and 24/7 emergency response. From 8% of rent.</p></div>
+    <div class="svc"><div class="ic">04</div><h3>Building &amp; Fit-Out</h3><p>Interior fit-outs and refurbishments for commercial tenants, fixed-price and scheduled.</p></div>
+    <div class="svc"><div class="ic">05</div><h3>Investment Advisory</h3><p>Yield analysis, portfolio review, and off-plan sourcing for investors.</p></div>
+    <div class="svc"><div class="ic">✦</div><h3>Meridian Assistant</h3><p>An AI assistant that answers tenant and owner questions instantly, from our own documents.</p></div>
+  </div>
+</div></section>
+
+<section class="stats"><div class="wrap">
+  <div class="statgrid">
+    <div class="stat"><div class="n">15+</div><div class="l">Years operating</div></div>
+    <div class="stat"><div class="n">3,200</div><div class="l">Units under management</div></div>
+    <div class="stat"><div class="n">3</div><div class="l">Cities across the GCC</div></div>
+    <div class="stat"><div class="n">6–9%</div><div class="l">Typical gross yields</div></div>
+  </div>
+</div></section>
+
+<section class="docs" id="docs"><div class="wrap">
+  <div class="eyebrow">Resources</div>
+  <h2>Tenant &amp; owner documents</h2>
+  <p class="lead">The same documents power the Meridian Assistant — ask it anything from these and it answers with a citation.</p>
+  <div class="doclist">
+    <div class="doc"><div class="pdf">PDF</div><div><h4>Services Guide</h4><p>Full overview of our five service lines, fees, and how to reach us.</p></div></div>
+    <div class="doc"><div class="pdf">PDF</div><div><h4>Leasing FAQ</h4><p>Deposits, rent payment, renewals, maintenance, and early termination.</p></div></div>
+    <div class="doc"><div class="pdf">PDF</div><div><h4>Management Policy</h4><p>Service standards, fee schedule, response targets, and complaints.</p></div></div>
+  </div>
+</div></section>
+
+<footer id="contact"><div class="wrap">
+  <div class="fgrid">
+    <div class="fcol">
+      <div class="brand">Meridian<span style="color:var(--gold-soft)">.</span> Property Group</div>
+      <div style="margin-top:10px;max-width:34ch;color:rgba(255,255,255,.6)">Real estate, leasing, and building management across Dubai, Riyadh, and Cairo.</div>
+    </div>
+    <div class="fcol"><h5>Contact</h5>
+      <div>support@meridianpg.example</div><div>leasing@meridianpg.example</div>
+      <div>Sun–Thu · 9:00–18:00</div></div>
+    <div class="fcol"><h5>Services</h5>
+      <div><a href="#services">Sales</a></div><div><a href="#services">Leasing</a></div>
+      <div><a href="#services">Management</a></div></div>
+  </div>
+  <div class="fbar">© 2026 Meridian Property Group (fictional demo). Built to showcase an Amazon Lex + Bedrock Knowledge Base support assistant.</div>
+</div></footer>
+
+<!-- ================= Chat widget ================= -->
+<button id="chatBtn" onclick="toggleChat()" aria-label="Open chat">💬</button>
+<div id="chatPanel">
+  <div class="chead">
+    <div class="avatar">M</div>
+    <div><div class="t">Meridian Assistant</div><div class="s">● powered by Amazon Bedrock</div></div>
+  </div>
+  <div class="cbody" id="cbody">
+    <div class="msg bot">Hello! I'm the Meridian Assistant. Ask me about leasing, deposits, maintenance, fees, or anything in our tenant &amp; owner documents.</div>
+  </div>
+  <div class="chips" id="chips">
+    <div class="chip" onclick="send(this.textContent)">How much is the security deposit?</div>
+    <div class="chip" onclick="send(this.textContent)">How do I pay rent?</div>
+    <div class="chip" onclick="send(this.textContent)">What's the management fee?</div>
+    <div class="chip" onclick="send(this.textContent)">Can I end my lease early?</div>
+  </div>
+  <div class="cfoot">
+    <input id="cinput" placeholder="Type your question…" onkeydown="if(event.key==='Enter')send()">
+    <button onclick="send()">➤</button>
+  </div>
+  <div class="note">Demo responses are canned. Wire this to your Lex bot to go live.</div>
+</div>
+
+<script>
+// ================= Bilingual demo (Option A: one EN KB + Translate at edges) =================
+// Production: fulfillment Lambda does Comprehend detect -> Translate AR->EN ->
+// RetrieveAndGenerate (EN KB) -> Translate answer EN->AR. Here we ship both
+// language strings for the demo so you can see the exact UX.
+
+let LANG = "en";  // "en" | "ar"
+
+const UI = {
+  en: {greet:"Hello! I'm the Meridian Assistant. Ask me about leasing, deposits, maintenance, or fees — I'll keep it short.",
+       ph:"Type your question…", head:"Meridian Assistant", sub:"powered by Amazon Bedrock",
+       more:"Anything else?", note:"Demo responses are canned. Wire to your Lex bot to go live.",
+       chips:["How much is the deposit?","How do I pay rent?","What's the management fee?"]},
+  ar: {greet:"مرحباً! أنا مساعد ميريديان. اسألني عن الإيجار أو التأمين أو الصيانة أو الرسوم — وسأجيبك باختصار.",
+       ph:"اكتب سؤالك…", head:"مساعد ميريديان", sub:"مدعوم بواسطة Amazon Bedrock",
+       more:"هل تحتاج شيئاً آخر؟", note:"الردود تجريبية. اربطها بروبوت Lex للتشغيل الفعلي.",
+       chips:["كم قيمة التأمين؟","كيف أدفع الإيجار؟","ما هي رسوم الإدارة؟"]}
+};
+
+// KB answers in both languages, drawn from the same source facts.
+const KB = [
+  {k:["deposit","security","تأمين","الضمان"],
+   en:"The deposit is 5% of annual rent (unfurnished) or 10% (furnished), fully refundable within 30 days of handover, less any damage.",
+   ar:"التأمين 5% من الإيجار السنوي (غير مفروش) أو 10% (مفروش)، ويُسترد بالكامل خلال 30 يوماً من التسليم بعد خصم أي أضرار.",
+   src:{en:"Leasing FAQ",ar:"الأسئلة الشائعة للإيجار"}},
+  {k:["pay","rent","payment","cheque","إيجار","دفع","شيك"],
+   en:"Rent is paid by bank transfer, direct debit, or 1–4 cheques a year. Cash above AED 5,000 isn't accepted.",
+   ar:"يُدفع الإيجار بالتحويل البنكي أو الخصم المباشر أو بـ 1–4 شيكات سنوياً. لا تُقبل المبالغ النقدية فوق 5,000 درهم.",
+   src:{en:"Leasing FAQ",ar:"الأسئلة الشائعة للإيجار"}},
+  {k:["management fee","fee","managed","رسوم","إدارة"],
+   en:"Management fees are 8% of rent for a single residential unit, 6% for portfolios, and 7% for commercial units.",
+   ar:"رسوم الإدارة 8% من الإيجار للوحدة السكنية الواحدة، و6% للمحافظ العقارية، و7% للوحدات التجارية.",
+   src:{en:"Management Policy",ar:"سياسة الإدارة"}},
+  {k:["end","terminate","early","break","إنهاء","فسخ","مبكر"],
+   en:"Early termination usually needs two months' notice plus a two-month-rent penalty. Check clause 8 of your contract.",
+   ar:"يتطلب الإنهاء المبكر عادةً إشعاراً بشهرين مع غرامة تعادل إيجار شهرين. راجع البند 8 من عقدك.",
+   src:{en:"Leasing FAQ",ar:"الأسئلة الشائعة للإيجار"}},
+  {k:["maintenance","repair","broken","fix","صيانة","إصلاح","عطل"],
+   en:"Landlords cover major repairs; tenants cover minor ones up to AED 500. Emergencies are attended within 4 hours via the 24/7 line.",
+   ar:"يتحمل المالك الإصلاحات الكبرى، ويتحمل المستأجر الأعطال الصغيرة حتى 500 درهم. تُعالَج الطوارئ خلال 4 ساعات عبر الخط على مدار الساعة.",
+   src:{en:"Management Policy",ar:"سياسة الإدارة"}},
+  {k:["renew","renewal","increase","تجديد","زيادة"],
+   en:"Renewal notice goes out 90 days before your end date. Any increase follows the local rental index and legal cap.",
+   ar:"يُرسل إشعار التجديد قبل 90 يوماً من انتهاء العقد. وأي زيادة تتبع مؤشر الإيجارات المحلي والحد القانوني.",
+   src:{en:"Leasing FAQ",ar:"الأسئلة الشائعة للإيجار"}},
+];
+
+function detectLang(q){ return /[\u0600-\u06FF]/.test(q) ? "ar" : "en"; }
+function answer(q){
+  const low=q.toLowerCase(); let best=null,score=0;
+  for(const it of KB){ const s=it.k.reduce((n,kw)=>n+(low.includes(kw)?1:0),0); if(s>score){score=s;best=it;} }
+  const lang = detectLang(q);  // reply in the language asked, regardless of UI toggle
+  if(best&&score>0) return {a:best[lang], src:best.src[lang], lang};
+  const fb = lang==="ar"
+    ? "يمكنني المساعدة في الإيجار والتأمين والدفع والصيانة والرسوم. جرّب أحد الاقتراحات بالأعلى."
+    : "I can help with leasing, deposits, payment, maintenance, and fees. Try one of the suggestions above.";
+  return {a:fb, src:null, lang};
+}
+
+const cbody=document.getElementById('cbody'), chips=document.getElementById('chips');
+function toggleChat(){document.getElementById('chatPanel').classList.toggle('open');}
+function openChat(){document.getElementById('chatPanel').classList.add('open');}
+
+function applyLang(){
+  const u=UI[LANG];
+  document.body.classList.toggle('rtl', LANG==="ar");
+  document.getElementById('langBtn').textContent = LANG==="en" ? "العربية" : "English";
+  document.querySelector('.chead .t').textContent=u.head;
+  document.querySelector('.chead .s').textContent="● "+u.sub;
+  document.getElementById('cinput').placeholder=u.ph;
+  document.querySelector('.note').textContent=u.note;
+  // reset conversation to greeting + fresh chips in the chosen language
+  cbody.innerHTML='';
+  bubble(u.greet,'bot');
+  chips.style.display='flex';
+  chips.innerHTML=u.chips.map(c=>`<div class="chip" onclick="send(this.textContent)">${c}</div>`).join('');
+}
+function toggleLang(){ LANG = LANG==="en" ? "ar" : "en"; applyLang(); openChat(); }
+
+function bubble(text,cls,src){
+  const d=document.createElement('div');d.className='msg '+cls;d.textContent=text;
+  if(src){const c=document.createElement('div');c.className='cite';
+    c.textContent=(LANG==="ar"?"المصدر: ":"Source: ")+src;d.appendChild(c);}
+  cbody.appendChild(d);cbody.scrollTop=cbody.scrollHeight;
+}
+function send(text){
+  const input=document.getElementById('cinput');
+  const q=(text||input.value).trim();if(!q)return;
+  input.value='';chips.style.display='none';
+  bubble(q,'me');
+  setTimeout(()=>{
+    const r=answer(q);
+    bubble(r.a,'bot',r.src);
+    // SHORT FLOW: after answering, offer one next step rather than interrogating
+    setTimeout(()=>{
+      const more=UI[r.lang].more;
+      const d=document.createElement('div');d.className='msg bot';d.textContent=more;
+      cbody.appendChild(d);
+      chips.style.display='flex';
+      chips.innerHTML=UI[r.lang].chips.map(c=>`<div class="chip" onclick="send(this.textContent)">${c}</div>`).join('');
+      cbody.scrollTop=cbody.scrollHeight;
+    },500);
+  },420);
+}
+applyLang();
+</script>
+</body>
+</html>
