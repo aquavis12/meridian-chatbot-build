@@ -1,0 +1,5 @@
+# local
+*.zip
+out.json
+.DS_Store
+__pycache__/
