@@ -11,6 +11,12 @@ Two ways to stand it up, side by side:
 - **Manual console runbook** (`runbook/BUILD.md`) for the parts that aren't
   (S3 Vectors bucket/index, and the Lex bot + QnAIntent).
 
+## Architecture
+
+![Architecture](docs/architecture.png)
+
+*Amazon Lex (QnAIntent) → Comprehend detect → Translate AR↔EN → Bedrock Knowledge Base (S3 Vectors) → Claude, with Bedrock Guardrails on the answer. Editable source: `docs/architecture.drawio`.*
+
 ## What's automated vs manual
 
 | Piece | How |
@@ -54,17 +60,17 @@ infra/template.yaml        CloudFormation: KB + S3 Vectors + guardrail + fulfill
 scripts/00-bootstrap-vectors.sh   pre-create the vector bucket + index
 scripts/01-deploy.sh              deploy + upload docs + ingest
 scripts/add-doc.sh                manually add one more document
-runbook/BUILD.md           the manual console steps (Lex, model access, Web UI)
+BUILD.md           the manual console steps (Lex, model access, Web UI)
 docs/*.pdf                 3 English KB source documents
-docs/architecture.drawio   architecture incl. Comprehend + Translate + Guardrails
-site/index.html            bilingual demo site (toggle, RTL, short flow)
+docs/architecture.png      rendered architecture diagram
+index.html            bilingual demo site (toggle, RTL, short flow)
 ```
 
 ## Bilingual design (the AWS pattern)
 
 One English KB. At runtime the fulfillment Lambda runs Comprehend
 (detect) → Translate (AR→EN) → RetrieveAndGenerate → Translate (EN→AR).
-One document set to maintain; see `docs/architecture.drawio`.
+One document set to maintain; see the architecture diagram above.
 
 ## Note
 
