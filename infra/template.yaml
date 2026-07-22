@@ -1,1 +1,249 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Meridian bilingual support chatbot — the CloudFormation-able parts.
+  Source S3 bucket, Bedrock Knowledge Base backed by S3 Vectors, its data
+  source, a Bedrock Guardrail, and the Lex fulfillment Lambda that does
+  Comprehend detect + Translate (AR<->EN) around RetrieveAndGenerate.
 
+  NOT in this template (create manually — see runbook/): the S3 Vector
+  bucket + index (no CFN resource type yet) and the Lex bot + QnAIntent
+  (not CFN-native). This stack takes the vector index ARN as a parameter.
+
+Parameters:
+  VectorIndexArn:
+    Type: String
+    Description: >
+      ARN of the pre-created S3 Vectors index (made by scripts/00-bootstrap-vectors.sh
+      before this stack, since CFN can't create it).
+  VectorBucketArn:
+    Type: String
+    Description: ARN of the S3 vector bucket holding the index.
+  EmbeddingModelArn:
+    Type: String
+    Default: "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-embed-text-v2:0"
+    Description: Titan Text Embeddings V2 (1024-dim) — must match the index dimension.
+  AnswerModelId:
+    Type: String
+    Default: "anthropic.claude-3-5-sonnet-20241022-v2:0"
+    Description: Foundation model that generates answers in RetrieveAndGenerate.
+
+Resources:
+
+  SourceBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub meridian-kb-source-${AWS::AccountId}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # ---- Knowledge Base service role ----
+  KBRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: meridian-kb-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: bedrock.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: kb-access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: bedrock:InvokeModel
+                Resource: !Ref EmbeddingModelArn
+              - Effect: Allow
+                Action: [s3:GetObject, s3:ListBucket]
+                Resource:
+                  - !GetAtt SourceBucket.Arn
+                  - !Sub ${SourceBucket.Arn}/*
+              - Effect: Allow
+                Action:
+                  - s3vectors:GetIndex
+                  - s3vectors:QueryVectors
+                  - s3vectors:PutVectors
+                  - s3vectors:GetVectors
+                  - s3vectors:DeleteVectors
+                Resource:
+                  - !Ref VectorBucketArn
+                  - !Ref VectorIndexArn
+
+  KnowledgeBase:
+    Type: AWS::Bedrock::KnowledgeBase
+    Properties:
+      Name: meridian-support-kb
+      RoleArn: !GetAtt KBRole.Arn
+      KnowledgeBaseConfiguration:
+        Type: VECTOR
+        VectorKnowledgeBaseConfiguration:
+          EmbeddingModelArn: !Ref EmbeddingModelArn
+      StorageConfiguration:
+        Type: S3_VECTORS
+        S3VectorsConfiguration:
+          VectorBucketArn: !Ref VectorBucketArn
+          IndexArn: !Ref VectorIndexArn
+
+  DataSource:
+    Type: AWS::Bedrock::DataSource
+    Properties:
+      Name: meridian-docs
+      KnowledgeBaseId: !Ref KnowledgeBase
+      DataSourceConfiguration:
+        Type: S3
+        S3Configuration:
+          BucketArn: !GetAtt SourceBucket.Arn
+      VectorIngestionConfiguration:
+        ChunkingConfiguration:
+          ChunkingStrategy: FIXED_SIZE
+          FixedSizeChunkingConfiguration:
+            MaxTokens: 300
+            OverlapPercentage: 20
+
+  # ---- Bedrock Guardrail: grounding + PII, applied to the KB answer ----
+  Guardrail:
+    Type: AWS::Bedrock::Guardrail
+    Properties:
+      Name: meridian-support-guardrail
+      Description: Keeps answers grounded in the KB and masks PII.
+      BlockedInputMessaging: "I can only help with Meridian property questions."
+      BlockedOutputsMessaging: "I don't have that in our documents — please contact support@meridianpg.example."
+      ContentPolicyConfig:
+        FiltersConfig:
+          - Type: HATE
+            InputStrength: HIGH
+            OutputStrength: HIGH
+          - Type: INSULTS
+            InputStrength: MEDIUM
+            OutputStrength: MEDIUM
+      SensitiveInformationPolicyConfig:
+        PiiEntitiesConfig:
+          - Type: EMAIL
+            Action: ANONYMIZE
+          - Type: PHONE
+            Action: ANONYMIZE
+          - Type: CREDIT_DEBIT_CARD_NUMBER
+            Action: BLOCK
+      ContextualGroundingPolicyConfig:
+        FiltersConfig:
+          - Type: GROUNDING
+            Threshold: 0.7
+          - Type: RELEVANCE
+            Threshold: 0.7
+
+  GuardrailVersion:
+    Type: AWS::Bedrock::GuardrailVersion
+    Properties:
+      GuardrailIdentifier: !GetAtt Guardrail.GuardrailId
+      Description: v1
+
+  # ---- Lex fulfillment Lambda: Comprehend detect + Translate + RetrieveAndGenerate ----
+  FulfillmentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: meridian-fulfillment-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: fulfillment
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
+              - Effect: Allow
+                Action: [comprehend:DetectDominantLanguage, translate:TranslateText]
+                Resource: "*"
+              - Effect: Allow
+                Action: [bedrock:RetrieveAndGenerate, bedrock:Retrieve, bedrock:InvokeModel]
+                Resource: "*"
+
+  FulfillmentFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: meridian-fulfillment
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt FulfillmentRole.Arn
+      Timeout: 60
+      MemorySize: 512
+      Environment:
+        Variables:
+          KB_ID: !Ref KnowledgeBase
+          ANSWER_MODEL: !Ref AnswerModelId
+          GUARDRAIL_ID: !GetAtt Guardrail.GuardrailId
+          GUARDRAIL_VERSION: !GetAtt GuardrailVersion.Version
+      Code:
+        ZipFile: |
+          import os, boto3
+          comprehend = boto3.client("comprehend")
+          translate = boto3.client("translate")
+          br = boto3.client("bedrock-agent-runtime")
+          KB_ID = os.environ["KB_ID"]
+          MODEL = os.environ["ANSWER_MODEL"]
+          GID = os.environ["GUARDRAIL_ID"]
+          GVER = os.environ["GUARDRAIL_VERSION"]
+
+          def detect(text):
+              try:
+                  langs = comprehend.detect_dominant_language(Text=text)["Languages"]
+                  return langs[0]["LanguageCode"] if langs else "en"
+              except Exception:
+                  return "en"
+
+          def xlate(text, src, tgt):
+              if src == tgt:
+                  return text
+              return translate.translate_text(Text=text,
+                  SourceLanguageCode=src, TargetLanguageCode=tgt)["TranslatedText"]
+
+          def handler(event, context):
+              # Lex V2 fulfillment event
+              q = event.get("inputTranscript", "")
+              lang = detect(q)
+              base = "ar" if lang.startswith("ar") else "en"
+              q_en = xlate(q, base, "en")
+              resp = br.retrieve_and_generate(
+                  input={"text": q_en},
+                  retrieveAndGenerateConfiguration={
+                      "type": "KNOWLEDGE_BASE",
+                      "knowledgeBaseConfiguration": {
+                          "knowledgeBaseId": KB_ID,
+                          "modelArn": MODEL,
+                          "generationConfiguration": {
+                              "guardrailConfiguration": {
+                                  "guardrailId": GID,
+                                  "guardrailVersion": GVER}}}})
+              answer_en = resp["output"]["text"]
+              answer = xlate(answer_en, "en", base)
+              return {
+                  "sessionState": {
+                      "dialogAction": {"type": "Close"},
+                      "intent": {"name": event["sessionState"]["intent"]["name"],
+                                 "state": "Fulfilled"}},
+                  "messages": [{"contentType": "PlainText", "content": answer}]}
+
+Outputs:
+  SourceBucket:
+    Value: !Ref SourceBucket
+  KnowledgeBaseId:
+    Value: !Ref KnowledgeBase
+  DataSourceId:
+    Value: !Ref DataSource
+  FulfillmentFunctionArn:
+    Value: !GetAtt FulfillmentFunction.Arn
+  GuardrailId:
+    Value: !GetAtt Guardrail.GuardrailId
